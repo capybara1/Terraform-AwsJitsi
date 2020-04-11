@@ -7,7 +7,18 @@ Terraform project for setting up Jitsi on AWS.
 - Registered DNS domain on AWS Route53 is available
 - An RSA key pair for SSH connection is available
 
-## Deploy
+## Configure
+
+
+```sh
+cat <<EOT > terraform.tfvars
+domain = "your domain"
+zone = "your zone"
+public_key_path = "path to public key file"
+EOT
+```
+
+## Apply
 
 ```sh
 terraform init
