@@ -241,9 +241,9 @@ resource "aws_instance" "server" {
     Name = var.prefix
   }
 
-  provisioner "remote-exec" {
-    script = "setup.sh"
-  }
+#  provisioner "remote-exec" {
+#    script = "setup.sh"
+#  }
 }
 
 resource "aws_ebs_volume" "storage" {

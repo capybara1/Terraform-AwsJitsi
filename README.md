@@ -2,10 +2,17 @@
 
 Terraform project for setting up Jitsi on AWS.
 
+This approach is realized on the base of an [article][1] which guides
+through manual creation of a Jisti Meet server.
+However an important deviation is the use of an Application Load Balancer and
+TLS termination instad of an elastic IP address bound to the server and
+a certificate issued by letsencypt.
+
 ## Prerequisites
 
-- Registered DNS domain on AWS Route53 is available
-- An RSA key pair for SSH connection is available
+- A DNS zone, managed by AWS Route53, is available
+- A TLS certificate, managed by AWS Certificate Manager, is available
+- A RSA key pair for SSH connection is available
 
 ## Configure
 
