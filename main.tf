@@ -5,7 +5,7 @@ provider "aws" {
 
 
 locals {
-  subnets = cidrsubnets(var.vpc_cidr_block, 8, 8, 8, 8)
+  subnets             = cidrsubnets(var.vpc_cidr_block, 8, 8, 8, 8)
   server_subnet_index = 0
 }
 
@@ -173,7 +173,7 @@ resource "aws_security_group" "default" {
   }
 
   tags = {
-    Name     = "${var.prefix}-Default"
+    Name = "${var.prefix}-Default"
   }
 }
 
@@ -225,7 +225,7 @@ resource "aws_security_group" "lb" {
   }
 
   tags = {
-    Name     = "${var.prefix}-ALB"
+    Name = "${var.prefix}-ALB"
   }
 }
 
@@ -238,11 +238,11 @@ resource "aws_instance" "server" {
   ]
   key_name = aws_key_pair.default.id
   tags = {
-    Name     = var.prefix
+    Name = var.prefix
   }
 
   provisioner "remote-exec" {
-    script      = "setup.sh"
+    script = "setup.sh"
   }
 }
 
