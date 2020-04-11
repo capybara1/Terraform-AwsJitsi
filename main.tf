@@ -11,7 +11,7 @@ locals {
 
 
 data "aws_acm_certificate" "default" {
-  domain   = var.domain
+  domain   = var.cert_domain
   statuses = ["ISSUED"]
 }
 
@@ -121,7 +121,7 @@ resource "aws_lb_listener" "https" {
 
 resource "aws_route53_record" "cname_record" {
   zone_id = data.aws_route53_zone.default.zone_id
-  name    = var.domain
+  name    = var.service_domain
   type    = "CNAME"
   ttl     = "60"
   records = [aws_lb.default.dns_name]
@@ -231,7 +231,7 @@ resource "aws_security_group" "lb" {
 
 resource "aws_instance" "server" {
   instance_type = var.instance_type
-  ami           = var.images[var.instance_type]
+  ami           = var.images[var.aws_region]
   subnet_id     = aws_subnet.public[local.server_subnet_index].id
   vpc_security_group_ids = [
     aws_security_group.default.id
@@ -248,7 +248,7 @@ resource "aws_instance" "server" {
 
 resource "aws_ebs_volume" "storage" {
   type              = "gp2"
-  availability_zone = data.aws_availability_zones.available[local.server_subnet_index]
+  availability_zone = data.aws_availability_zones.available.zone_ids[local.server_subnet_index]
   size              = 10
   iops              = 100
   tags = {

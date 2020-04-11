@@ -28,16 +28,20 @@ variable "private_subnet_count" {
   default     = 2
 }
 
-variable "domain" {
-  description = "The fully qualified name of the DNS domain."
+variable "service_domain" {
+  description = "The DNS domain resolving to the server ip."
+}
+
+variable "cert_domain" {
+  description = "The DNS domain of the certificate in AWS Certificate Manager."
 }
 
 variable "zone" {
-  description = "The name of the DNS zone."
+  description = "The name of the DNS zone in AWS Route53."
 }
 
 variable "key_name" {
-  description = "The name of the RSA key pair in AWS."
+  description = "The name of the RSA key pair to store in AWS."
   default     = "Jitsi-Keys"
 }
 

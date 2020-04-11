@@ -12,9 +12,10 @@ Terraform project for setting up Jitsi on AWS.
 
 ```sh
 cat <<EOT > terraform.tfvars
-domain = "your domain"
-zone = "your zone"
-public_key_path = "path to public key file"
+service_domain = "jitsi.your-domain.de"
+cert_domain = "*.your-domain.de"
+zone = "your-domain.de."
+public_key_path = "~/.ssh/id_rsa"
 EOT
 ```
 
