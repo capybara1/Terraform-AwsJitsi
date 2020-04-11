@@ -1,0 +1,6 @@
+*               text=auto
+*.bat           text eol=crlf
+*.com           text eol=crlf
+*.sh            text eol=lf
+.gitattributes  text eol=lf
+.gitignore      text eol=lf

@@ -6,6 +6,7 @@ provider "aws" {
 
 locals {
   subnets = cidrsubnets(var.vpc_cidr_block, 8, 8, 8, 8)
+  server_subnet_index = 0
 }
 
 
@@ -27,7 +28,7 @@ data "aws_availability_zones" "available" {
 resource "aws_vpc" "default" {
   cidr_block = var.vpc_cidr_block
   tags = {
-    Name = "SonarQube"
+    Name = var.prefix
   }
 }
 
@@ -38,23 +39,23 @@ resource "aws_route" "internet_access" {
 }
 
 resource "aws_subnet" "public" {
-  count                   = 2
+  count                   = var.public_subnet_count
   vpc_id                  = aws_vpc.default.id
   availability_zone_id    = data.aws_availability_zones.available.zone_ids[count.index]
   cidr_block              = locals.subnets[count.index]
   map_public_ip_on_launch = true
   tags = {
-    Name = "SonarQube-Public-${count.index + 1}"
+    Name = "${var.prefix}-Public-${count.index + 1}"
   }
 }
 
 resource "aws_subnet" "private" {
-  count                = 2
+  count                = var.private_subnet_count
   vpc_id               = aws_vpc.default.id
   availability_zone_id = data.aws_availability_zones.available.zone_ids[count.index]
-  cidr_block           = locals.subnets[count.index + 2]
+  cidr_block           = locals.subnets[count.index + var.public_subnet_count]
   tags = {
-    Name = "SonarQube-Private-${count.index + 1}"
+    Name = "${var.prefix}-Private-${count.index + 1}"
   }
 }
 
@@ -69,23 +70,23 @@ resource "aws_route_table" "public" {
     gateway_id = aws_internet_gateway.default.id
   }
   tags = {
-    Name = "SonarQube-Public-RouteTable"
+    Name = "${var.prefix}-Public"
   }
 }
 
 resource "aws_lb" "default" {
-  name               = "SonarQube-ALB"
+  name               = "${var.prefix}-Default"
   load_balancer_type = "application"
   internal           = false
   subnets            = locals.subnets
   security_groups    = [aws_security_group.lb.id]
   tags = {
-    Name = "Sonarqube-ALB"
+    Name = "${var.prefix}-Default"
   }
 }
 
 resource "aws_lb_target_group" "default" {
-  name     = "SonarQube-DefaultTargetGroup"
+  name     = "${var.prefix}-Default"
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.default.id
@@ -132,7 +133,7 @@ resource "aws_key_pair" "default" {
 }
 
 resource "aws_security_group" "default" {
-  name        = "SonarQube-DefaultSecurityGroup"
+  name        = "${var.prefix}-Default"
   description = "Controls access from/to instance"
   vpc_id      = aws_vpc.default.id
 
@@ -150,6 +151,20 @@ resource "aws_security_group" "default" {
     cidr_blocks = ["10.1.0.0/16"]
   }
 
+  ingress {
+    from_port   = 4443
+    to_port     = 4443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 10000
+    to_port     = 10000
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -158,12 +173,12 @@ resource "aws_security_group" "default" {
   }
 
   tags = {
-    Name     = "SonarQube-DefaultSecurityGroup"
+    Name     = "${var.prefix}-Default"
   }
 }
 
 resource "aws_security_group" "lb" {
-  name        = "SonarQube-AlbSecurityGroup"
+  name        = "${var.prefix}-ALB"
   description = "Controls access from/to load balancer"
   vpc_id      = aws_vpc.default.id
 
@@ -181,6 +196,27 @@ resource "aws_security_group" "lb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 4443
+    to_port     = 4443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 10000
+    to_port     = 10000
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -189,30 +225,34 @@ resource "aws_security_group" "lb" {
   }
 
   tags = {
-    Name     = "SonarQube-AlbSecurityGroup"
+    Name     = "${var.prefix}-ALB"
   }
 }
 
 resource "aws_instance" "server" {
-  instance_type = "t3a.medium"
-  ami           = "ami-0e698fee1e6224f1a"
-  subnet_id     = aws_subnet.public[0].id
+  instance_type = var.instance_type
+  ami           = var.images[var.instance_type]
+  subnet_id     = aws_subnet.public[locals.server_subnet_index].id
   vpc_security_group_ids = [
     aws_security_group.default.id
   ]
   key_name = aws_key_pair.default.id
   tags = {
-    Name     = "SonarQube-Server"
+    Name     = var.prefix
+  }
+
+  provisioner "remote-exec" {
+    script      = "setup.sh"
   }
 }
 
 resource "aws_ebs_volume" "storage" {
   type              = "gp2"
-  availability_zone = "eu-central-1a"
+  availability_zone = data.aws_availability_zones.available[locals.server_subnet_index]
   size              = 10
   iops              = 100
   tags = {
-    Name = "SonarQube-Storage"
+    Name = var.prefix
   }
 }
 
