@@ -5,7 +5,8 @@ provider "aws" {
 
 
 locals {
-  subnets             = cidrsubnets(var.vpc_cidr_block, 8, 8, 8, 8)
+  public_subnets      = [for i in range(var.public_subnet_count) : cidrsubnet(var.vpc_cidr_block, 4, i)]
+  private_subnets     = [for i in range(var.private_subnet_count) : cidrsubnet(var.vpc_cidr_block, 4, i + var.public_subnet_count)]
   server_subnet_index = 0
 }
 
@@ -42,7 +43,7 @@ resource "aws_subnet" "public" {
   count                   = var.public_subnet_count
   vpc_id                  = aws_vpc.default.id
   availability_zone_id    = data.aws_availability_zones.available.zone_ids[count.index]
-  cidr_block              = local.subnets[count.index]
+  cidr_block              = local.public_subnets[count.index]
   map_public_ip_on_launch = true
   tags = {
     Name = "${var.prefix}-Public-${count.index + 1}"
@@ -53,7 +54,7 @@ resource "aws_subnet" "private" {
   count                = var.private_subnet_count
   vpc_id               = aws_vpc.default.id
   availability_zone_id = data.aws_availability_zones.available.zone_ids[count.index]
-  cidr_block           = local.subnets[count.index + var.public_subnet_count]
+  cidr_block           = local.private_subnets[count.index]
   tags = {
     Name = "${var.prefix}-Private-${count.index + 1}"
   }
@@ -78,7 +79,7 @@ resource "aws_lb" "default" {
   name               = "${var.prefix}-Default"
   load_balancer_type = "application"
   internal           = false
-  subnets            = local.subnets
+  subnets            = local.public_subnets
   security_groups    = [aws_security_group.lb.id]
   tags = {
     Name = "${var.prefix}-Default"
@@ -241,9 +242,9 @@ resource "aws_instance" "server" {
     Name = var.prefix
   }
 
-#  provisioner "remote-exec" {
-#    script = "setup.sh"
-#  }
+  #  provisioner "remote-exec" {
+  #    script = "setup.sh"
+  #  }
 }
 
 resource "aws_ebs_volume" "storage" {
