@@ -42,7 +42,7 @@ resource "aws_subnet" "public" {
   count                   = var.public_subnet_count
   vpc_id                  = aws_vpc.default.id
   availability_zone_id    = data.aws_availability_zones.available.zone_ids[count.index]
-  cidr_block              = locals.subnets[count.index]
+  cidr_block              = local.subnets[count.index]
   map_public_ip_on_launch = true
   tags = {
     Name = "${var.prefix}-Public-${count.index + 1}"
@@ -53,7 +53,7 @@ resource "aws_subnet" "private" {
   count                = var.private_subnet_count
   vpc_id               = aws_vpc.default.id
   availability_zone_id = data.aws_availability_zones.available.zone_ids[count.index]
-  cidr_block           = locals.subnets[count.index + var.public_subnet_count]
+  cidr_block           = local.subnets[count.index + var.public_subnet_count]
   tags = {
     Name = "${var.prefix}-Private-${count.index + 1}"
   }
@@ -78,7 +78,7 @@ resource "aws_lb" "default" {
   name               = "${var.prefix}-Default"
   load_balancer_type = "application"
   internal           = false
-  subnets            = locals.subnets
+  subnets            = local.subnets
   security_groups    = [aws_security_group.lb.id]
   tags = {
     Name = "${var.prefix}-Default"
@@ -232,7 +232,7 @@ resource "aws_security_group" "lb" {
 resource "aws_instance" "server" {
   instance_type = var.instance_type
   ami           = var.images[var.instance_type]
-  subnet_id     = aws_subnet.public[locals.server_subnet_index].id
+  subnet_id     = aws_subnet.public[local.server_subnet_index].id
   vpc_security_group_ids = [
     aws_security_group.default.id
   ]
@@ -248,7 +248,7 @@ resource "aws_instance" "server" {
 
 resource "aws_ebs_volume" "storage" {
   type              = "gp2"
-  availability_zone = data.aws_availability_zones.available[locals.server_subnet_index]
+  availability_zone = data.aws_availability_zones.available[local.server_subnet_index]
   size              = 10
   iops              = 100
   tags = {

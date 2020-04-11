@@ -29,12 +29,11 @@ variable "private_subnet_count" {
 }
 
 variable "domain" {
-  description = "The DNS domain."
+  description = "The fully qualified name of the DNS domain."
 }
 
 variable "zone" {
-  description = "The DNS domain."
-  default     = "${var.domain}."
+  description = "The name of the DNS zone."
 }
 
 variable "key_name" {
@@ -53,7 +52,7 @@ variable "instance_type" {
 
 variable "images" {
   description = "AWS machine images for specific regions."
-  type = "map"
+  type = map
   default = {
     eu-central-1 = "ami-0b418580298265d5c" # Ubuntu 18.04 LTS (64-bit x86)
   }
