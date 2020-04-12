@@ -13,6 +13,8 @@ DefaultTasksMax=65000
 EOT
 sudo systemctl daemon-reload
 
+sudo apt install -y apt-transport-https
+
 sudo tee /etc/apt/sources.list.d/jitsi-stable.list <<EOT > /dev/null 
 deb https://download.jitsi.org stable/
 EOT
