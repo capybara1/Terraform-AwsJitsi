@@ -19,6 +19,8 @@ EOT
 wget -qO - https://download.jitsi.org/jitsi-key.gpg.key | sudo apt-key add -
 sudo apt-get update
 
+sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+
 sudo apt install -y nginx
 sudo systemctl start nginx.service
 sudo systemctl enable nginx.service
@@ -32,4 +34,4 @@ jitsi-meet-web-config jitsi-videobridge/jvb-hostname string $DOMAIN
 jitsi-meet-web-config jitsi-meet/jvb-hostname string $DOMAIN
 EOT
 
-sudo DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install jitsi-meet
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y jitsi-meet
