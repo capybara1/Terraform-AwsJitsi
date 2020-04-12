@@ -7,7 +7,7 @@ provider "aws" {
 locals {
   public_subnet_cidr_blocks  = [for i in range(var.public_subnet_count) : cidrsubnet(var.vpc_cidr_block, var.vpc_subnet_bits, i)]
   private_subnet_cidr_blocks = [for i in range(var.private_subnet_count) : cidrsubnet(var.vpc_cidr_block, var.vpc_subnet_bits, i + var.public_subnet_count)]
-  server_subnet_index         = 0
+  server_subnet_index        = 0
 }
 
 
@@ -241,6 +241,13 @@ resource "aws_instance" "server" {
   associate_public_ip_address = true
   tags = {
     Name = var.prefix
+  }
+
+  connection {
+    type    = "ssh"
+    host    = self.public_ip
+    user    = "ubuntu"
+    timeout = "2m"
   }
 
   provisioner "file" {

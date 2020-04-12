@@ -14,8 +14,7 @@ a certificate issued by letsencypt.
 - A TLS certificate, managed by AWS Certificate Manager, is available
 - A RSA key pair for SSH connection is available
 
-## Configure
-
+## Prepare
 
 ```sh
 cat <<EOT > terraform.tfvars
@@ -24,6 +23,11 @@ cert_domain = "*.your-domain.de"
 zone = "your-domain.de."
 public_key_path = "~/.ssh/id_rsa.pub"
 EOT
+```
+
+```
+eval $(ssh-agent -s)
+ssh-add ~/.ssh/id_rsa
 ```
 
 ## Apply
