@@ -243,9 +243,17 @@ resource "aws_instance" "server" {
     Name = var.prefix
   }
 
-  #  provisioner "remote-exec" {
-  #    script = "setup.sh"
-  #  }
+  provisioner "file" {
+    source      = "setup.sh"
+    destination = "/tmp/setup.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/setup.sh",
+      "DOMAIN=${var.service_domain} /tmp/setup.sh",
+    ]
+  }
 }
 
 # resource "aws_ebs_volume" "storage" {
