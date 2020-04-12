@@ -5,9 +5,9 @@ provider "aws" {
 
 
 locals {
-  public_subnets      = [for i in range(var.public_subnet_count) : cidrsubnet(var.vpc_cidr_block, 4, i)]
-  private_subnets     = [for i in range(var.private_subnet_count) : cidrsubnet(var.vpc_cidr_block, 4, i + var.public_subnet_count)]
-  server_subnet_index = 0
+  public_subnet_cidr_blocks  = [for i in range(var.public_subnet_count) : cidrsubnet(var.vpc_cidr_block, var.vpc_subnet_bits, i)]
+  private_subnet_cidr_blocks = [for i in range(var.private_subnet_count) : cidrsubnet(var.vpc_cidr_block, var.vpc_subnet_bits, i + var.public_subnet_count)]
+  server_subnet_index         = 0
 }
 
 
@@ -43,7 +43,7 @@ resource "aws_subnet" "public" {
   count                   = var.public_subnet_count
   vpc_id                  = aws_vpc.default.id
   availability_zone_id    = data.aws_availability_zones.available.zone_ids[count.index]
-  cidr_block              = local.public_subnets[count.index]
+  cidr_block              = local.public_subnet_cidr_blocks[count.index]
   map_public_ip_on_launch = true
   tags = {
     Name = "${var.prefix}-Public-${count.index + 1}"
@@ -54,7 +54,7 @@ resource "aws_subnet" "private" {
   count                = var.private_subnet_count
   vpc_id               = aws_vpc.default.id
   availability_zone_id = data.aws_availability_zones.available.zone_ids[count.index]
-  cidr_block           = local.private_subnets[count.index]
+  cidr_block           = local.private_subnet_cidr_blocks[count.index]
   tags = {
     Name = "${var.prefix}-Private-${count.index + 1}"
   }
@@ -79,7 +79,7 @@ resource "aws_lb" "default" {
   name               = "${var.prefix}-Default"
   load_balancer_type = "application"
   internal           = false
-  subnets            = local.public_subnets
+  subnets            = aws_subnet.public[*].id
   security_groups    = [aws_security_group.lb.id]
   tags = {
     Name = "${var.prefix}-Default"
@@ -142,28 +142,28 @@ resource "aws_security_group" "default" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["212.184.195.20/32"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["10.1.0.0/16"]
+    cidr_blocks = local.public_subnet_cidr_blocks
   }
 
   ingress {
     from_port   = 4443
     to_port     = 4443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = local.public_subnet_cidr_blocks
   }
 
   ingress {
     from_port   = 10000
     to_port     = 10000
     protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = local.public_subnet_cidr_blocks
   }
 
   egress {
@@ -237,7 +237,8 @@ resource "aws_instance" "server" {
   vpc_security_group_ids = [
     aws_security_group.default.id
   ]
-  key_name = aws_key_pair.default.id
+  key_name                    = aws_key_pair.default.id
+  associate_public_ip_address = true
   tags = {
     Name = var.prefix
   }
@@ -247,21 +248,21 @@ resource "aws_instance" "server" {
   #  }
 }
 
-resource "aws_ebs_volume" "storage" {
-  type              = "gp2"
-  availability_zone = data.aws_availability_zones.available.zone_ids[local.server_subnet_index]
-  size              = 10
-  iops              = 100
-  tags = {
-    Name = var.prefix
-  }
-}
+# resource "aws_ebs_volume" "storage" {
+#   type              = "gp2"
+#   availability_zone = data.aws_availability_zones.available.names[local.server_subnet_index]
+#   size              = 10
+#   iops              = 100
+#   tags = {
+#     Name = var.prefix
+#   }
+# }
 
-resource "aws_volume_attachment" "server-storage" {
-  device_name = "/dev/sda1"
-  volume_id   = aws_ebs_volume.storage.id
-  instance_id = aws_instance.server.id
-}
+# resource "aws_volume_attachment" "server-storage" {
+#   device_name = "/dev/sda1"
+#   volume_id   = aws_ebs_volume.storage.id
+#   instance_id = aws_instance.server.id
+# }
 
 resource "aws_lb_target_group_attachment" "server-default" {
   target_group_arn = aws_lb_target_group.default.arn

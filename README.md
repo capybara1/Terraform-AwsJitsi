@@ -22,7 +22,7 @@ cat <<EOT > terraform.tfvars
 service_domain = "jitsi.your-domain.de"
 cert_domain = "*.your-domain.de"
 zone = "your-domain.de."
-public_key_path = "~/.ssh/id_rsa"
+public_key_path = "~/.ssh/id_rsa.pub"
 EOT
 ```
 

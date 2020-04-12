@@ -15,7 +15,12 @@ variable "prefix" {
 
 variable "vpc_cidr_block" {
   description = "The VPC network."
-  default     = "10.0.0.0/16"
+  default     = "10.0.0.0/24"
+}
+
+variable "vpc_subnet_bits" {
+  description = "The number of new bits used for subnetting."
+  default     = 3
 }
 
 variable "public_subnet_count" {
