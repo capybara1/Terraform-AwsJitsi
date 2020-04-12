@@ -2,6 +2,10 @@
 
 set -eu
 
+sudo hostnamectl set-hostname $DOMAIN
+
+sudo sed -i 's/.*localhost$/127.0.0.1 localhost '$DOMAIN'/g' /etc/hosts
+
 sudo tee -a /etc/systemd/system.conf <<EOT > /dev/null 
 DefaultLimitNOFILE=65000
 DefaultLimitNPROC=65000
@@ -14,6 +18,10 @@ deb https://download.jitsi.org stable/
 EOT
 wget -qO - https://download.jitsi.org/jitsi-key.gpg.key | sudo apt-key add -
 sudo apt-get update
+
+sudo apt install -y nginx
+sudo systemctl start nginx.service
+sudo systemctl enable nginx.service
 
 cat <<EOT | sudo debconf-set-selections
 jitsi-videobridge2 jitsi-videobridge/jvb-hostname string $DOMAIN
