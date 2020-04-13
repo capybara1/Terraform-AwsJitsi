@@ -2,9 +2,9 @@
 
 set -eu
 
-sudo hostnamectl set-hostname $DOMAIN
+sudo hostnamectl set-hostname ${domain}
 
-sudo sed -i 's/.*localhost$/127.0.0.1 localhost '$DOMAIN'/g' /etc/hosts
+sudo sed -i 's/.*localhost$/127.0.0.1 localhost '${domain}'/g' /etc/hosts
 
 sudo tee -a /etc/systemd/system.conf <<EOT > /dev/null 
 DefaultLimitNOFILE=65000
@@ -28,13 +28,10 @@ sudo systemctl start nginx.service
 sudo systemctl enable nginx.service
 
 cat <<EOT | sudo debconf-set-selections
-jitsi-videobridge2 jitsi-videobridge/jvb-hostname string $DOMAIN
-jitsi-meet-web-config jitsi-meet/cert-choice string Generate a new self-signed certificate (You will later get a chance to obtain a Let's encrypt certificate)
-jitsi-meet-web-config jitsi-meet/cert-path-crt string /etc/ssl/$DOMAIN.crt
-jitsi-meet-web-config jitsi-meet/cert-path-key string /etc/ssl/$DOMAIN.key
-jitsi-meet-web-config jitsi-meet/jvb-hostname string $DOMAIN
-jitsi-meet-turnserver jitsi-meet-turnserver/jvb-hostname string $DOMAIN
-jitsi-meet-web-config jitsi-videobridge/jvb-hostname string $DOMAIN
+jitsi-meet-web-config jitsi-meet/cert-choice             select Generate a new self-signed certificate (You will later get a chance to obtain a Let's encrypt certificate)
+jitsi-meet-web-config jitsi-meet/jvb-hostname            string ${domain}
+jitsi-meet-turnserver jitsi-meet-turnserver/jvb-hostname string ${domain}
+jitsi-videobridge2    jitsi-videobridge/jvb-hostname     string ${domain}
 EOT
 
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y jitsi-meet

@@ -25,6 +25,29 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"] # Canonical
+}
+
+data "template_file" "setup" {
+  template = file("setup.tpl")
+  vars = {
+    domain = var.service_domain
+  }
+}
+
 
 resource "aws_vpc" "default" {
   cidr_block = var.vpc_cidr_block
@@ -272,35 +295,18 @@ resource "aws_security_group" "server" {
 
 resource "aws_instance" "server" {
   instance_type = var.instance_type
-  ami           = var.images[var.aws_region]
+  ami           = data.aws_ami.ubuntu.id
   subnet_id     = aws_subnet.public[local.server_subnet_index].id
   vpc_security_group_ids = [
     aws_security_group.server.id
   ]
   key_name                    = aws_key_pair.default.id
   associate_public_ip_address = true
+  user_data                   = data.template_file.setup.rendered
   tags = {
     Name = var.prefix
   }
 
-  connection {
-    type    = "ssh"
-    host    = self.public_ip
-    user    = "ubuntu"
-    timeout = "2m"
-  }
-
-  provisioner "file" {
-    source      = "setup.sh"
-    destination = "/tmp/setup.sh"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "chmod +x /tmp/setup.sh",
-      "DOMAIN=${var.service_domain} /tmp/setup.sh",
-    ]
-  }
 }
 
 # resource "aws_ebs_volume" "storage" {

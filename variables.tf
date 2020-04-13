@@ -58,11 +58,3 @@ variable "instance_type" {
   description = "AWS EC2 instance type."
   default     = "t3.large"
 }
-
-variable "images" {
-  description = "AWS machine images for specific regions."
-  type        = map
-  default = {
-    eu-central-1 = "ami-0b418580298265d5c" # Ubuntu 18.04 LTS (64-bit x86)
-  }
-}
