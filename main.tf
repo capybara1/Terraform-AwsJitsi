@@ -183,6 +183,11 @@ resource "aws_lb_target_group" "https" {
   port     = 443
   protocol = "TCP"
   vpc_id   = aws_vpc.default.id
+
+  health_check {
+    protocol = "TCP"
+    port     = 80
+  }
 }
 
 resource "aws_lb_listener" "https" {
@@ -202,6 +207,11 @@ resource "aws_lb_target_group" "videobridge1" {
   port     = 4443
   protocol = "TCP"
   vpc_id   = aws_vpc.default.id
+
+  health_check {
+    protocol = "TCP"
+    port     = 80
+  }
 }
 
 resource "aws_lb_listener" "videobridge1" {
@@ -222,7 +232,7 @@ resource "aws_lb_target_group" "videobridge2" {
 
   health_check {
     protocol = "TCP"
-    port     = 4443
+    port     = 80
   }
 }
 
@@ -257,28 +267,32 @@ resource "aws_security_group" "server" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = local.public_subnet_cidr_blocks
+    cidr_blocks = ["0.0.0.0/0"]
+#    cidr_blocks = local.public_subnet_cidr_blocks
   }
 
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = local.public_subnet_cidr_blocks
+    cidr_blocks = ["0.0.0.0/0"]
+#    cidr_blocks = local.public_subnet_cidr_blocks
   }
 
   ingress {
     from_port   = 4443
     to_port     = 4443
     protocol    = "tcp"
-    cidr_blocks = local.public_subnet_cidr_blocks
+    cidr_blocks = ["0.0.0.0/0"]
+#    cidr_blocks = local.public_subnet_cidr_blocks
   }
 
   ingress {
     from_port   = 10000
     to_port     = 10000
     protocol    = "udp"
-    cidr_blocks = local.public_subnet_cidr_blocks
+    cidr_blocks = ["0.0.0.0/0"]
+#    cidr_blocks = local.public_subnet_cidr_blocks
   }
 
   egress {
