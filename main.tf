@@ -103,39 +103,20 @@ resource "aws_security_group" "lb" {
   description = "Controls access from/to load balancer"
   vpc_id      = aws_vpc.default.id
 
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 4443
-    to_port     = 4443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 10000
-    to_port     = 10000
-    protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
+  dynamic "ingress" {
+    for_each = [
+      { port = 80, protocol = "tcp" },
+      { port = 443, protocol = "tcp" },
+      { port = 4443, protocol = "tcp" },
+      { port = 10000, protocol = "udp" }
+    ]
+    iterator = it
+    content {
+      from_port   = it.value.port
+      to_port     = it.value.port
+      protocol    = it.value.protocol
+      cidr_blocks = ["0.0.0.0/0"]
+    }
   }
 
   egress {
@@ -256,43 +237,21 @@ resource "aws_security_group" "server" {
   description = "Controls access from/to Jitsi server instance"
   vpc_id      = aws_vpc.default.id
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-#    cidr_blocks = local.public_subnet_cidr_blocks
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-#    cidr_blocks = local.public_subnet_cidr_blocks
-  }
-
-  ingress {
-    from_port   = 4443
-    to_port     = 4443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-#    cidr_blocks = local.public_subnet_cidr_blocks
-  }
-
-  ingress {
-    from_port   = 10000
-    to_port     = 10000
-    protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
-#    cidr_blocks = local.public_subnet_cidr_blocks
+  dynamic "ingress" {
+    for_each = [
+      { port = 22, protocol = "tcp" },
+      { port = 80, protocol = "tcp" },
+      { port = 443, protocol = "tcp" },
+      { port = 4443, protocol = "tcp" },
+      { port = 10000, protocol = "udp" }
+    ]
+    iterator = it
+    content {
+      from_port   = it.value.port
+      to_port     = it.value.port
+      protocol    = it.value.protocol
+      cidr_blocks = ["0.0.0.0/0"]
+    }
   }
 
   egress {
