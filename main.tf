@@ -247,7 +247,7 @@ resource "aws_lb_listener" "videobridge2" {
 }
 
 resource "aws_key_pair" "default" {
-  key_name   = var.key_name
+  key_name   = var.prefix
   public_key = file(var.public_key_path)
 }
 

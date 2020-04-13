@@ -45,11 +45,6 @@ variable "zone" {
   description = "The name of the DNS zone in AWS Route53."
 }
 
-variable "key_name" {
-  description = "The name of the RSA key pair to store in AWS."
-  default     = "Jitsi-Keys"
-}
-
 variable "public_key_path" {
   description = "Path to the RSA public key."
 }
