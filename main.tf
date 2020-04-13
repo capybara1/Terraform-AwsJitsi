@@ -239,18 +239,18 @@ resource "aws_security_group" "server" {
 
   dynamic "ingress" {
     for_each = [
-      { port = 22, protocol = "tcp" },
-      { port = 80, protocol = "tcp" },
-      { port = 443, protocol = "tcp" },
-      { port = 4443, protocol = "tcp" },
+      { port = 22, cidr_blocks = var.ssh_whitelist },
+      { port = 80 },
+      { port = 443 },
+      { port = 4443 },
       { port = 10000, protocol = "udp" }
     ]
     iterator = it
     content {
       from_port   = it.value.port
       to_port     = it.value.port
-      protocol    = it.value.protocol
-      cidr_blocks = ["0.0.0.0/0"]
+      protocol    = lookup(it.value, "protocol", "tcp")
+      cidr_blocks = lookup(it.value, "cidr_blocks", ["0.0.0.0/0"])
     }
   }
 

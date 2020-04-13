@@ -13,6 +13,10 @@ variable "prefix" {
   default     = "Jitsi"
 }
 
+variable "ssh_whitelist" {
+  default = ["0.0.0.0/0"]
+}
+
 variable "vpc_cidr_block" {
   description = "The VPC network."
   default     = "10.0.0.0/24"
