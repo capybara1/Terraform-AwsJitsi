@@ -23,6 +23,7 @@ module "service" {
   prefix          = var.prefix
   vpc_id          = module.vpc.vpc_id
   subnet_id       = module.vpc.public_subnet_ids[local.server_subnet_index]
+  email           = var.email
   service_domain  = var.service_domain
   ssh_whitelist   = var.ssh_whitelist
   public_key_path = var.public_key_path

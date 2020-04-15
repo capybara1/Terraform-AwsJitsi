@@ -10,6 +10,10 @@ variable "subnet_id" {
   type = string
 }
 
+variable "email" {
+  type = string
+}
+
 variable "service_domain" {
   type = string
 }

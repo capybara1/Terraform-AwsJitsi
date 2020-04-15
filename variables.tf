@@ -46,6 +46,11 @@ variable "private_subnet_count" {
   default     = 2
 }
 
+variable "email" {
+  description = "The e-mail address required for letsencrypt registration."
+  type = string
+}
+
 variable "service_domain" {
   description = "The DNS domain resolving to the server ip."
   type        = string
