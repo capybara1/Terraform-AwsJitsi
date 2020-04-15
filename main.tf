@@ -24,7 +24,7 @@ module "service" {
   vpc_id          = module.vpc.vpc_id
   subnet_id       = module.vpc.public_subnet_ids[local.server_subnet_index]
   email           = var.email
-  service_domain  = var.service_domain
+  domain          = var.domain
   ssh_whitelist   = var.ssh_whitelist
   public_key_path = var.public_key_path
   instance_type   = var.instance_type
@@ -33,11 +33,10 @@ module "service" {
 module "lb" {
   source = "./lb"
 
-  prefix         = var.prefix
-  vpc_id         = module.vpc.vpc_id
-  subnet_ids     = module.vpc.public_subnet_ids
-  instance_id    = module.service.instance_id
-  service_domain = var.service_domain
-  cert_domain    = var.cert_domain
-  zone           = var.zone
+  prefix      = var.prefix
+  vpc_id      = module.vpc.vpc_id
+  subnet_ids  = module.vpc.public_subnet_ids
+  instance_id = module.service.instance_id
+  domain      = var.domain
+  zone        = var.zone
 }

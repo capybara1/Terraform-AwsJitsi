@@ -6,36 +6,33 @@ This approach is realized on the base of [this article][1] which guides
 through manual creation of a Jisti Meet server.
 The official [quick install][2] and [another article][3] have been used for
 refinement.
-However an important deviation is the use of an Application Load Balancer and
-TLS termination instad of an elastic IP address bound to the server and
-a certificate issued by letsencypt.
-
 ## Prerequisites
 
 - A DNS zone, managed by AWS Route53, is available
-- A TLS certificate, managed by AWS Certificate Manager, is available
 - A RSA key pair for SSH connection is available
 
 ## Prepare
 
+Initialize Terraform
+
+```sh
+terraform init
+```
+
+Configure
+
 ```sh
 cat <<EOT > terraform.tfvars
-service_domain = "jitsi.your-domain.de"
-cert_domain = "*.your-domain.de"
+email = john.doe@example.com
+domain = "jitsi.your-domain.de"
 zone = "your-domain.de."
 public_key_path = "~/.ssh/id_rsa.pub"
 EOT
 ```
 
-```
-eval $(ssh-agent -s)
-ssh-add ~/.ssh/id_rsa
-```
-
 ## Apply
 
 ```sh
-terraform init
 terraform apply
 ```
 

@@ -14,11 +14,7 @@ variable "instance_id" {
   type = string
 }
 
-variable "service_domain" {
-  type = string
-}
-
-variable "cert_domain" {
+variable "domain" {
   type = string
 }
 

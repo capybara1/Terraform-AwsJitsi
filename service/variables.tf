@@ -14,7 +14,7 @@ variable "email" {
   type = string
 }
 
-variable "service_domain" {
+variable "domain" {
   type = string
 }
 

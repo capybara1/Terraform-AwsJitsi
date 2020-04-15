@@ -51,13 +51,8 @@ variable "email" {
   type = string
 }
 
-variable "service_domain" {
+variable "domain" {
   description = "The DNS domain resolving to the server ip."
-  type        = string
-}
-
-variable "cert_domain" {
-  description = "The DNS domain of the certificate in AWS Certificate Manager."
   type        = string
 }
 
