@@ -1,10 +1,3 @@
-terraform {
-  required_providers {
-    template = "~> 2.1"
-  }
-}
-
-
 provider "aws" {
   profile = var.aws_profile
   region  = var.aws_region
@@ -17,7 +10,7 @@ locals {
 
 
 module "vpc" {
-  source = "../Terraform-AwsBasicVpc"
+  source = "github.com/capybara1/Terraform-AwsBasicVpc?ref=v1.0.0"
 
   vpc_cidr_block            = var.vpc_cidr_block
   prefix                    = var.prefix
