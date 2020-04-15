@@ -18,7 +18,7 @@ data "template_file" "setup" {
   template = file("modules/service/setup.tpl")
   vars = {
     domain = var.domain
-    email = var.email
+    email  = var.email
   }
 }
 

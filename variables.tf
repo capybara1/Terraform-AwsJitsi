@@ -48,7 +48,7 @@ variable "private_subnet_count" {
 
 variable "email" {
   description = "The e-mail address required for letsencrypt registration."
-  type = string
+  type        = string
 }
 
 variable "domain" {
