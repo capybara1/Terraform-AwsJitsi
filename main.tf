@@ -18,7 +18,7 @@ module "vpc" {
 }
 
 module "service" {
-  source = "./service"
+  source = "./modules/service"
 
   prefix          = var.prefix
   vpc_id          = module.vpc.vpc_id
@@ -31,7 +31,7 @@ module "service" {
 }
 
 module "lb" {
-  source = "./lb"
+  source = "./modules/lb"
 
   prefix      = var.prefix
   vpc_id      = module.vpc.vpc_id

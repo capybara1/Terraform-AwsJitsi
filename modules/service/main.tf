@@ -15,7 +15,7 @@ data "aws_ami" "ubuntu" {
 }
 
 data "template_file" "setup" {
-  template = file("service/setup.tpl")
+  template = file("modules/service/setup.tpl")
   vars = {
     domain = var.domain
     email = var.email
