@@ -33,3 +33,10 @@ jitsi-videobridge2    jitsi-videobridge/jvb-hostname string ${domain}
 EOT
 
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y jitsi-meet &>> ~/install_log
+
+# sudo sed -i -e '/listen/ s/ssl http2/http2/
+#                 /ssl_/d
+#                 s/add_header Strict-Transport-Security/# add_header Strict-Transport-Security/' /etc/nginx/sites-available/jitsi.jochens-cloud.de.conf
+# sudo systemctl reload nginx
+
+echo ${email} | /usr/share/jitsi-meet/scripts/install-letsencrypt-cert.sh &>> ~/install_log
