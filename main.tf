@@ -17,8 +17,8 @@ module "vpc" {
   number_of_private_subnets = 0
 }
 
-module "service" {
-  source = "./modules/service"
+module "ec2" {
+  source = "./modules/ec2"
 
   prefix          = var.prefix
   vpc_id          = module.vpc.vpc_id
@@ -28,6 +28,7 @@ module "service" {
   ssh_whitelist   = var.ssh_whitelist
   public_key_path = var.public_key_path
   instance_type   = var.instance_type
+  instance_root_volume_size   = var.instance_root_volume_size
 }
 
 module "lb" {
@@ -36,7 +37,7 @@ module "lb" {
   prefix      = var.prefix
   vpc_id      = module.vpc.vpc_id
   subnet_ids  = module.vpc.public_subnet_ids
-  instance_id = module.service.instance_id
+  instance_id = module.ec2.instance_id
   domain      = var.domain
   zone        = var.zone
 }

@@ -29,3 +29,7 @@ variable "public_key_path" {
 variable "instance_type" {
   type = string
 }
+
+variable "instance_root_volume_size" {
+  type = number
+}

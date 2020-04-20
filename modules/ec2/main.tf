@@ -15,7 +15,7 @@ data "aws_ami" "ubuntu" {
 }
 
 data "template_file" "setup" {
-  template = file("modules/service/setup.tpl")
+  template = file("modules/ec2/setup.tpl")
   vars = {
     domain = var.domain
     email  = var.email
@@ -70,24 +70,13 @@ resource "aws_instance" "server" {
   key_name                    = aws_key_pair.default.id
   associate_public_ip_address = length(var.ssh_whitelist) > 0
   user_data                   = data.template_file.setup.rendered
+
+  root_block_device {
+    volume_size = var.instance_root_volume_size
+    volume_type = "gp2"
+  }
+
   tags = {
     Name = var.prefix
   }
-
 }
-
-# resource "aws_ebs_volume" "storage" {
-#   type              = "gp2"
-#   availability_zone = data.aws_availability_zones.available.names[local.server_subnet_index]
-#   size              = 10
-#   iops              = 100
-#   tags = {
-#     Name = var.prefix
-#   }
-# }
-
-# resource "aws_volume_attachment" "server-storage" {
-#   device_name = "/dev/sda1"
-#   volume_id   = aws_ebs_volume.storage.id
-#   instance_id = aws_instance.server.id
-# }
