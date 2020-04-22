@@ -1,3 +1,5 @@
+![CI](https://github.com/capybara1/Terraform-AwsJitsi/workflows/CI/badge.svg)
+
 # Jitsi on AWS
 
 Terraform project for setting up Jitsi on AWS.
