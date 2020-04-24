@@ -4,15 +4,13 @@ root = true
 charset = utf-8
 indent_style = space
 indent_size = 2
-tab_width = 2
+tab_width = 4
 trim_trailing_whitespace = true
 insert_final_newline = true
 
-[{.gitmessage,.gitignore,.gitattributes}]
+[{.git*,*.sh}]
 end_of_line = lf
+indent_style = tab
 
-[*.sh]
-end_of_line = lf
-
-[*.{bat,com}]
+[*.{bat,cmd}]
 end_of_line = crlf
